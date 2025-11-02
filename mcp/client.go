@@ -16,6 +16,7 @@ type Provider string
 const (
 	ProviderDeepSeek Provider = "deepseek"
 	ProviderQwen     Provider = "qwen"
+	ProviderMiniMax  Provider = "minimax"
 	ProviderCustom   Provider = "custom"
 )
 
@@ -47,6 +48,15 @@ func (cfg *Client) SetDeepSeekAPIKey(apiKey string) {
 	cfg.APIKey = apiKey
 	cfg.BaseURL = "https://api.deepseek.com/v1"
 	cfg.Model = "deepseek-chat"
+}
+
+// SetMiniMaxAPIKey 设置MiniMax API密钥
+func (cfg *Client) SetMiniMaxAPIKey(apiKey string) {
+	cfg.Provider = ProviderMiniMax
+	cfg.APIKey = apiKey
+	cfg.BaseURL = "https://api.minimax.io/anthropic"
+	cfg.Model = "MiniMax-M2"
+	cfg.Timeout = 300 * time.Second // 5 minutes for free tier
 }
 
 // SetQwenAPIKey 设置阿里云Qwen API密钥
@@ -183,6 +193,10 @@ func (cfg *Client) callOnce(systemPrompt, userPrompt string) (string, error) {
 		// 阿里云Qwen使用API-Key认证
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.APIKey))
 		// 注意：如果使用的不是兼容模式，可能需要不同的认证方式
+	case ProviderMiniMax:
+		// MiniMax使用Anthropic兼容格式
+		req.Header.Set("x-api-key", cfg.APIKey)
+		req.Header.Set("anthropic-version", "2023-06-01")
 	default:
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.APIKey))
 	}
