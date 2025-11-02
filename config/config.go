@@ -31,9 +31,15 @@ type TraderConfig struct {
 	AsterSigner     string `json:"aster_signer,omitempty"`      // Aster API钱包地址
 	AsterPrivateKey string `json:"aster_private_key,omitempty"` // Aster API钱包私钥
 
+	// Delta Exchange配置
+	DeltaAPIKey    string `json:"delta_api_key,omitempty"`    // Delta API Key
+	DeltaAPISecret string `json:"delta_api_secret,omitempty"` // Delta API Secret
+	DeltaTestnet   bool   `json:"delta_testnet,omitempty"`    // 是否使用测试网
+
 	// AI配置
 	QwenKey     string `json:"qwen_key,omitempty"`
 	DeepSeekKey string `json:"deepseek_key,omitempty"`
+	MiniMaxKey  string `json:"minimax_key,omitempty"`
 
 	// 自定义AI API配置（支持任何OpenAI格式的API）
 	CustomAPIURL    string `json:"custom_api_url,omitempty"`
@@ -147,10 +153,18 @@ func (c *Config) Validate() error {
 			if trader.AsterUser == "" || trader.AsterSigner == "" || trader.AsterPrivateKey == "" {
 				return fmt.Errorf("trader[%d]: 使用Aster时必须配置aster_user, aster_signer和aster_private_key", i)
 			}
+		} else if trader.Exchange == "delta" {
+			if trader.DeltaAPIKey == "" || trader.DeltaAPISecret == "" {
+				return fmt.Errorf("trader[%d]: 使用Delta Exchange时必须配置delta_api_key和delta_api_secret", i)
+			}
 		}
 
 		if trader.AIModel == "qwen" && trader.QwenKey == "" {
 			return fmt.Errorf("trader[%d]: 使用Qwen时必须配置qwen_key", i)
+		}
+
+		if trader.AIModel == "minimax" && trader.MiniMaxKey == "" {
+			return fmt.Errorf("trader[%d]: 使用MiniMax时必须配置minimax_key", i)
 		}
 		if trader.AIModel == "deepseek" && trader.DeepSeekKey == "" {
 			return fmt.Errorf("trader[%d]: 使用DeepSeek时必须配置deepseek_key", i)

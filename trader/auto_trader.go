@@ -21,7 +21,7 @@ type AutoTraderConfig struct {
 	AIModel string // AI模型: "qwen" 或 "deepseek"
 
 	// 交易平台选择
-	Exchange string // "binance", "hyperliquid" 或 "aster"
+	Exchange string // "binance", "hyperliquid", "aster" 或 "delta"
 
 	// 币安API配置
 	BinanceAPIKey    string
@@ -37,12 +37,18 @@ type AutoTraderConfig struct {
 	AsterSigner     string // Aster API钱包地址
 	AsterPrivateKey string // Aster API钱包私钥
 
+	// Delta Exchange配置
+	DeltaAPIKey    string // Delta API Key
+	DeltaAPISecret string // Delta API Secret
+	DeltaTestnet   bool   // 是否使用测试网
+
 	CoinPoolAPIURL string
 
 	// AI配置
 	UseQwen     bool
 	DeepSeekKey string
 	QwenKey     string
+	MiniMaxKey  string
 
 	// 自定义AI API配置
 	CustomAPIURL    string
@@ -109,6 +115,10 @@ func NewAutoTrader(config AutoTraderConfig) (*AutoTrader, error) {
 		// 使用自定义API
 		mcpClient.SetCustomAPI(config.CustomAPIURL, config.CustomAPIKey, config.CustomModelName)
 		log.Printf("🤖 [%s] 使用自定义AI API: %s (模型: %s)", config.Name, config.CustomAPIURL, config.CustomModelName)
+	} else if config.AIModel == "minimax" {
+		// 使用MiniMax
+		mcpClient.SetMiniMaxAPIKey(config.MiniMaxKey)
+		log.Printf("🤖 [%s] 使用MiniMax M2 AI (免费)", config.Name)
 	} else if config.UseQwen || config.AIModel == "qwen" {
 		// 使用Qwen
 		mcpClient.SetQwenAPIKey(config.QwenKey, "")
@@ -149,6 +159,9 @@ func NewAutoTrader(config AutoTraderConfig) (*AutoTrader, error) {
 		if err != nil {
 			return nil, fmt.Errorf("初始化Aster交易器失败: %w", err)
 		}
+	case "delta":
+		log.Printf("🏦 [%s] 使用Delta Exchange交易", config.Name)
+		trader = NewDeltaTrader(config.DeltaAPIKey, config.DeltaAPISecret, config.DeltaTestnet)
 	default:
 		return nil, fmt.Errorf("不支持的交易平台: %s", config.Exchange)
 	}
