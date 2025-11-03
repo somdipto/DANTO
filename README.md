@@ -1,4 +1,4 @@
-# 🤖 DANTO - Universal Agentic Trading OS
+# 🤖 DANTO - Agentic Trading OS
 
 <div align="center">
 
