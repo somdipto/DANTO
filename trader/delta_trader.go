@@ -14,7 +14,8 @@ import (
 	"time"
 )
 
-// DeltaTrader Delta Exchange交易器
+// DeltaTrader Delta Exchange trader implementation
+// Delta Exchange is a crypto derivatives exchange supporting futures, options, and perpetuals
 type DeltaTrader struct {
 	apiKey    string
 	apiSecret string
@@ -22,7 +23,7 @@ type DeltaTrader struct {
 	client    *http.Client
 }
 
-// NewDeltaTrader 创建Delta Exchange交易器
+// NewDeltaTrader creates new Delta Exchange trader
 func NewDeltaTrader(apiKey, apiSecret string, testnet bool) *DeltaTrader {
 	baseURL := "https://api.delta.exchange"
 	if testnet {
@@ -37,7 +38,8 @@ func NewDeltaTrader(apiKey, apiSecret string, testnet bool) *DeltaTrader {
 	}
 }
 
-// generateSignature 生成Delta Exchange API签名
+// generateSignature generates Delta Exchange API signature
+// Delta uses HMAC-SHA256 with timestamp for authentication
 func (dt *DeltaTrader) generateSignature(method, path, body string, timestamp int64) string {
 	message := fmt.Sprintf("%s%s%s%d", method, path, body, timestamp)
 	h := hmac.New(sha256.New, []byte(dt.apiSecret))
@@ -45,7 +47,7 @@ func (dt *DeltaTrader) generateSignature(method, path, body string, timestamp in
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// makeRequest 发送HTTP请求
+// makeRequest sends HTTP request to Delta Exchange API
 func (dt *DeltaTrader) makeRequest(method, endpoint string, params map[string]interface{}) ([]byte, error) {
 	var body []byte
 	var err error
@@ -89,7 +91,7 @@ func (dt *DeltaTrader) makeRequest(method, endpoint string, params map[string]in
 	return respBody, nil
 }
 
-// GetBalance 获取账户余额
+// GetBalance gets account balance
 func (dt *DeltaTrader) GetBalance() (map[string]interface{}, error) {
 	respBody, err := dt.makeRequest("GET", "/v2/wallet/balances", nil)
 	if err != nil {
@@ -113,7 +115,7 @@ func (dt *DeltaTrader) GetBalance() (map[string]interface{}, error) {
 		return nil, fmt.Errorf("API returned error")
 	}
 
-	// 找到USDT余额
+	// Find USDT balance
 	for _, balance := range response.Result {
 		if balance.Asset == "USDT" {
 			return map[string]interface{}{
@@ -131,7 +133,7 @@ func (dt *DeltaTrader) GetBalance() (map[string]interface{}, error) {
 	}, nil
 }
 
-// GetPositions 获取所有持仓
+// GetPositions gets all positions
 func (dt *DeltaTrader) GetPositions() ([]map[string]interface{}, error) {
 	respBody, err := dt.makeRequest("GET", "/v2/positions", nil)
 	if err != nil {
@@ -179,7 +181,7 @@ func (dt *DeltaTrader) GetPositions() ([]map[string]interface{}, error) {
 	return positions, nil
 }
 
-// getProductId 获取产品ID
+// getProductId gets product ID for symbol
 func (dt *DeltaTrader) getProductId(symbol string) (int, error) {
 	respBody, err := dt.makeRequest("GET", "/v2/products", nil)
 	if err != nil {
@@ -207,7 +209,7 @@ func (dt *DeltaTrader) getProductId(symbol string) (int, error) {
 	return 0, fmt.Errorf("product not found: %s", symbol)
 }
 
-// OpenLong 开多仓
+// OpenLong opens long position
 func (dt *DeltaTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -235,7 +237,7 @@ func (dt *DeltaTrader) OpenLong(symbol string, quantity float64, leverage int) (
 	return response, nil
 }
 
-// OpenShort 开空仓
+// OpenShort opens short position
 func (dt *DeltaTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -263,7 +265,7 @@ func (dt *DeltaTrader) OpenShort(symbol string, quantity float64, leverage int) 
 	return response, nil
 }
 
-// CloseLong 平多仓
+// CloseLong closes long position
 func (dt *DeltaTrader) CloseLong(symbol string, quantity float64) (map[string]interface{}, error) {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -291,7 +293,7 @@ func (dt *DeltaTrader) CloseLong(symbol string, quantity float64) (map[string]in
 	return response, nil
 }
 
-// CloseShort 平空仓
+// CloseShort closes short position
 func (dt *DeltaTrader) CloseShort(symbol string, quantity float64) (map[string]interface{}, error) {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -319,7 +321,7 @@ func (dt *DeltaTrader) CloseShort(symbol string, quantity float64) (map[string]i
 	return response, nil
 }
 
-// SetLeverage 设置杠杆
+// SetLeverage sets leverage for symbol
 func (dt *DeltaTrader) SetLeverage(symbol string, leverage int) error {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -335,7 +337,7 @@ func (dt *DeltaTrader) SetLeverage(symbol string, leverage int) error {
 	return err
 }
 
-// GetMarketPrice 获取市场价格
+// GetMarketPrice gets current market price
 func (dt *DeltaTrader) GetMarketPrice(symbol string) (float64, error) {
 	endpoint := fmt.Sprintf("/v2/tickers/%s", symbol)
 	respBody, err := dt.makeRequest("GET", endpoint, nil)
@@ -361,7 +363,7 @@ func (dt *DeltaTrader) GetMarketPrice(symbol string) (float64, error) {
 	return response.Result.Price, nil
 }
 
-// SetStopLoss 设置止损单
+// SetStopLoss sets stop loss order
 func (dt *DeltaTrader) SetStopLoss(symbol string, positionSide string, quantity, stopPrice float64) error {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -386,7 +388,7 @@ func (dt *DeltaTrader) SetStopLoss(symbol string, positionSide string, quantity,
 	return err
 }
 
-// SetTakeProfit 设置止盈单
+// SetTakeProfit sets take profit order
 func (dt *DeltaTrader) SetTakeProfit(symbol string, positionSide string, quantity, takeProfitPrice float64) error {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -411,7 +413,7 @@ func (dt *DeltaTrader) SetTakeProfit(symbol string, positionSide string, quantit
 	return err
 }
 
-// CancelAllOrders 取消该币种的所有挂单
+// CancelAllOrders cancels all orders for symbol
 func (dt *DeltaTrader) CancelAllOrders(symbol string) error {
 	productId, err := dt.getProductId(symbol)
 	if err != nil {
@@ -426,8 +428,8 @@ func (dt *DeltaTrader) CancelAllOrders(symbol string) error {
 	return err
 }
 
-// FormatQuantity 格式化数量到正确的精度
+// FormatQuantity formats quantity to correct precision
 func (dt *DeltaTrader) FormatQuantity(symbol string, quantity float64) (string, error) {
-	// Delta Exchange通常使用8位小数精度
+	// Delta Exchange typically uses 8 decimal places for precision
 	return fmt.Sprintf("%.8f", quantity), nil
 }

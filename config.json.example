@@ -74,15 +74,41 @@
     {
       "id": "delta_deepseek",
       "name": "Delta Exchange DeepSeek Trader",
-      "enabled": true,
+      "enabled": false,
       "ai_model": "deepseek",
       "exchange": "delta",
-      "delta_api_key": "your_delta_api_key",
-      "delta_api_secret": "your_delta_api_secret",
-      "delta_testnet": false,
+      
+      // Delta Exchange API Configuration
+      // Get your API keys from: https://www.delta.exchange/app/account/api
+      "delta_api_key": "your_delta_api_key_here",
+      "delta_api_secret": "your_delta_api_secret_here",
+      "delta_testnet": true,  // Set to false for live trading
+      
+      // AI Configuration
       "deepseek_key": "your_deepseek_api_key",
+      
+      // Trading Configuration
       "initial_balance": 1000.0,
       "scan_interval_minutes": 3
+    },
+    {
+      "id": "delta_minimax",
+      "name": "Delta Exchange MiniMax Trader (FREE AI)",
+      "enabled": false,
+      "ai_model": "minimax",
+      "exchange": "delta",
+      
+      // Delta Exchange API Configuration
+      "delta_api_key": "your_delta_api_key_here",
+      "delta_api_secret": "your_delta_api_secret_here",
+      "delta_testnet": true,  // Recommended for testing
+      
+      // AI Configuration (FREE)
+      "minimax_key": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJHcm91cE5hbWUiOiJTb2RhbiBNb3MiLCJVc2VyTmFtZSI6IlNvZGFuIE1vcyIsIkFjY291bnQiOiIiLCJTdWJqZWN0SUQiOiIxOTg0OTA1ODg3MzU3MDgzNzY3IiwiUGhvbmUiOiIiLCJHcm91cElEIjoiMTk4NDkwNTg4NzM1Mjg4NTM2NyIsIlBhZ2VOYW1lIjoiIiwiTWFpbCI6InN4dm9jdXNhQGdtYWlsLmNvbSIsIkNyZWF0ZVRpbWUiOiIyMDI1LTExLTAyIDE3OjI1OjE1IiwiVG9rZW5UeXBlIjoxLCJpc3MiOiJtaW5pbWF4In0.HmT0S2cjLzUtaX7nk10Qd9vfg76KWCrcaensHzLj0bebgLJyta9TyU1vDhC42pWW_XEd0L18Ui4rJOGwwupV0gLO6xhVMsHoWZkySb9w6XAVNO6R3nyrTuAvz4mI0a-R2RYEr7XRiXLlvdNSN72gPifC49vcaI_3THmJTVllHwtE5UnSS3OPBnY4eWy-Slo1dNGcfCmJ4zhBdTluVKaL-yk9q4XF8PRxJN9IyebdVvivhu1SyQNdvJ9Qyvg-aQYPfIr3No9ATnvXvS3vMT72IbI9TnuYhCnMQUQfPFa5Cra4OAupjarENnO6NUJVKWs-G6l_owSggvHWJD_YN06HmA",
+      
+      // Trading Configuration
+      "initial_balance": 500.0,
+      "scan_interval_minutes": 5
     }
   ],
   "leverage": {
