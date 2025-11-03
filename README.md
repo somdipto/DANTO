@@ -9,7 +9,6 @@
 
 [![AI Providers](https://img.shields.io/badge/AI_Providers-4-purple.svg?style=for-the-badge)](#-ai-providers)
 [![Exchanges](https://img.shields.io/badge/Exchanges-4-blue.svg?style=for-the-badge)](#-supported-exchanges)
-[![Backed by Amber.ac](https://img.shields.io/badge/Backed_by-Amber.ac-orange.svg?style=for-the-badge)](https://amber.ac)
 
 **The world's first universal AI trading operating system with self-learning capabilities**
 
